@@ -23,8 +23,8 @@ namespace Tiktacktoe
                 board.remainingMoves--;
                 AI.randomMove(board);
                 board.array[AI.AISquare] = 2;
-                Console.WriteLine(AI.AISquare);
                 board.CheckWin(2);
+                board.remainingMoves--;
             }
             
         }
@@ -43,16 +43,16 @@ namespace Tiktacktoe
         }
         public bool CheckWin(int player)
         {
-            // Alle Gewinnkombinationen prüfen
+            // All win combinations
             int[][] winCombinations = new int[][]
             {
-                new int[] {0, 1, 2},  // horizontale Reihen
+                new int[] {0, 1, 2},  // horizontal
                 new int[] {3, 4, 5},
                 new int[] {6, 7, 8},
-                new int[] {0, 3, 6},  // vertikale Spalten
+                new int[] {0, 3, 6},  // vertical
                 new int[] {1, 4, 7},
                 new int[] {2, 5, 8},
-                new int[] {0, 4, 8},  // Diagonalen
+                new int[] {0, 4, 8},  // Diagonal
                 new int[] {2, 4, 6}
             };
 
@@ -62,13 +62,13 @@ namespace Tiktacktoe
                     array[combination[1]] == player &&
                     array[combination[2]] == player)
                 {
-                    win = 1;// Spieler hat gewonnen
+                    win = 1;//Player won
                     Console.WriteLine("Winner");
                     return true;
                 }
             }
 
-            return false;  // Kein Gewinn
+            return false;  // No win
         }
     }
     class legalCheck
@@ -99,40 +99,48 @@ namespace Tiktacktoe
     class randomPlay
     {
         public int AISquare;
-        public int tries;
+        public int tries = 0;
+        public bool aiwin;
         public void randomMove(Board board)
         {
             legalCheck Legal = new legalCheck();
-            Random random = new Random();
-            Board Win = new Board(); 
+            Random random = new Random(); 
             bool moveFound = false;
 
 
-
-            while (!moveFound)  // Solange kein gültiger Zug gefunden wurde
+            while (!moveFound)  
             {
-                Legal.square = random.Next(0, 9);  // Zufällige Zahl zwischen 0 und 8 generieren
-                Legal.CheckSquare(board);  // Überprüfen, ob der Zug gültig ist
+                Legal.square = random.Next(0, 9);  //randomly generate move
+                Legal.CheckSquare(board);  // Checking if move is legal
 
-                if (Legal.isLegal)  // Wenn der Zug gültig ist, speichere den Wert
+                if (Legal.isLegal)  // Move is legal
                 {
-                    if (Win.CheckWin(Legal.square))
+                    board.array[Legal.square] = 2;
+                    board.CheckWin(2);
+                    if (board.CheckWin(2)==true)
                     {
                         AISquare = Legal.square;
-                        moveFound = true;  // Beende die Schleife, wenn ein gültiger Zug gefunden wurde
-                        tries++;
-                        if (tries == Win.remainingMoves)
-                        {
-                          
-                        }
+                        Console.WriteLine(AISquare);
+                        moveFound = true;  // Ends if move is found
                     }
-                    tries++;
-                    if (tries == Win.remainingMoves)
+                    else if (tries == board.remainingMoves)//no winning move possible
                     {
+                        AISquare = Legal.square;
+                        moveFound = true;
+                        tries = 0;
+                        Console.WriteLine(AISquare);
 
                     }
+                    else { //Not a winning move
+                        
+                        board.array[Legal.square] = 0;
+                        tries = tries + 1;
+
+                    }
+
                 }
             }
+            
         }
     }
 }
