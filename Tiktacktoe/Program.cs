@@ -121,6 +121,7 @@ namespace Tiktacktoe
                     {
                         AISquare = Legal.square;
                         Console.WriteLine(AISquare);
+                        Console.WriteLine("Winner:AI");
                         moveFound = true;  // Ends if move is found
                     }
                     else if (tries == board.remainingMoves)//no winning move possible
