@@ -14,13 +14,12 @@ namespace Tiktacktoe
             board.BoardSetUp();
             legalCheck Legal = new legalCheck();
             randomPlay AI = new randomPlay();
-            while (Legal.isLegal == true)
+            while (true)
             {
-                Legal.square = Convert.ToInt32(Console.ReadLine());
-                Legal.CheckSquare(board);
-                board.array[Legal.square] = 1;
-                board.CheckWin(1);
-                board.remainingMoves--;
+                Console.WriteLine(board.array[0] + " " + board.array[1] + " " + board.array[2]);
+                Console.WriteLine(board.array[3] + " " + board.array[4] + " " + board.array[5]);
+                Console.WriteLine(board.array[6] + " " + board.array[7] + " " + board.array[8]);
+                playmov(board);
                 AI.AIOutput(board);
                 board.array[AI.AISquare] = 2;
                 board.CheckWin(2);
@@ -28,15 +27,42 @@ namespace Tiktacktoe
             }
 
         }
+        static void playmov(Board board)
+        {
+
+            legalCheck Legal = new legalCheck();
+            while (true)
+            {
+                Legal.square = Convert.ToInt32(Console.ReadLine());
+                Legal.CheckSquare(board);
+                board.CheckWin(1);
+                Console.WriteLine(Legal.isLegal);
+                Console.WriteLine(board.win);
+                if (Legal.isLegal == true)
+                {
+                    Console.WriteLine();
+                    board.array[Legal.square] = 1;
+                    board.remainingMoves--;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Zug nicht legal");
+                }
+        }
+        }
+
     }
     class Board
     {
+        public bool is0active = false;
         public int remainingMoves = 9;
         public int win = 0;
         public int[] array = new int[9];
+        public bool GameEnd=false;
         public void BoardSetUp()
         {
-            for (int i = 0; i < array.Length; i++)
+            for (int i = 0; i < 9; i++)
             {
                 array[i] = 0;
             }
@@ -77,10 +103,9 @@ namespace Tiktacktoe
         public bool isLegal = true;
         public void CheckSquare(Board board)
         {
-
             if (board.win == 0)
             {
-                if (board.array[square] == 1 || board.array[square] == 2)
+                if (board.array[square] != 0)
                 {
                     isLegal = false;
                 }
@@ -98,6 +123,8 @@ namespace Tiktacktoe
     }
     class randomPlay
     {
+        public int a = 0;
+        public int a2 = 0;
         public int AISquare;
         public int tries = 0;
         public bool aiwin;
@@ -108,36 +135,33 @@ namespace Tiktacktoe
         {
             legalCheck Legal = new legalCheck();
             Random random = new Random();
-            bool moveFound = false;
+
 
             for (int i = 0; i <9; i++)
             {
-                    Legal.square = allMoves[i];
+                    Legal.square = i;
                     Legal.CheckSquare(board);// Checking if move is legal
-                    moveFound = false;
+
                     if (Legal.isLegal)  // Move is legal
                     {
 
                         board.array[Legal.square] = 2;
-                        board.CheckWin(2);
                         if (board.CheckWin(2) == true)
                         {
-
                             board.array[Legal.square] = 0;
                             tries = 0;
                             AIWinsquare = Legal.square;
                             aiwin = true;
-                            moveFound = true;
-                            break;
+                        break;
                     }
-                        else if (tries == board.remainingMoves)//no winning move possible
+                        else if (tries == 8)//no winning move possible
                         {
 
                         aiwin = false;
                             
                             tries = 0;
                             board.array[Legal.square] = 0;
-                            break;
+                        break;
                             
 
 
@@ -156,26 +180,59 @@ namespace Tiktacktoe
             }
 
         }
-        public int[] allMoves = new int[9];
-        public void intallmove()
+        public void AIWin(Board board)
         {
-            for (int i = 0; i < allMoves.Length; i++)
+            legalCheck Legal = new legalCheck();
+            Random random = new Random();
+
+
+            for (int i = 0; i < 9; i++)
             {
-                allMoves[i] = i;
+                Legal.square = i;
+                Legal.CheckSquare(board);// Checking if move is legal
+
+                if (Legal.isLegal)  // Move is legal
+                {
+
+                    board.array[Legal.square] = 2;
+                    if (board.CheckWin(2) == true)
+                    {
+                        a++;
+                       board.array[Legal.square] = 0;
+                        tries = 0;
+                        AIWinsquare = Legal.square;
+                        aiwin = true;
+                    }
+                    else if (tries == 9)//no winning move possible
+                    {
+                        aiwin = false;
+                        tries = 0;
+                        board.array[Legal.square] = 0;
+                        break;
+                    }
+                    else
+                    { //Not a winning move
+                        board.array[Legal.square] = 0;
+                        tries++;
+                    }
+                    board.array[Legal.square] = 0;
+                }
+
             }
+
         }
+        
         public void PlayerWin(Board board)
         {
             legalCheck Legal = new legalCheck();
             Random random = new Random();
-            bool moveFound = false;
             for (int i=0; i<9;i++)
             {
-            intallmove();
+ 
 
             
 
-                    Legal.square = allMoves[i];  //randomly generate move
+                    Legal.square = i;  //generate move
                     Legal.CheckSquare(board);  // Checking if move is legal
                     
                     if (Legal.isLegal)
@@ -184,34 +241,36 @@ namespace Tiktacktoe
                         board.CheckWin(1);
                         if (board.CheckWin(1) == true)
                         {
-                            PlayerWinsquare = Legal.square;
+                        a2--;
+                        PlayerWinsquare = Legal.square;
                             board.array[Legal.square] = 0;
                             Playerwin = true;
-                            moveFound = true;
                             tries = 0;
-                        }
-                        else if (tries == board.remainingMoves)
+                            board.win = 0;
+
+                    }
+                        else if (tries == 8)
                         {
+
                             tries = 0;
                             board.array[Legal.square] = 0;
                             Playerwin = false;
-                            moveFound = true;
+                           
                         }
                         else
                         {
-                            board.array[Legal.square] = 0;
-                            tries = tries + 1;
+                        board.array[Legal.square] = 0;
+                        tries++;
 
                         }
+                    board.array[Legal.square] = 0;
                     }
-                
             }
         }
         public void AIOutput(Board board)
         {
             Random random = new Random();
             legalCheck Legal = new legalCheck();
-            intallmove();
             randomMove(board);
             PlayerWin(board);
             if (Playerwin)
@@ -233,22 +292,112 @@ namespace Tiktacktoe
             }
             else
             {
-                bool moveFound=false;
-                while (!moveFound)
+                
+                /* bool moveFound=false;
+                 while (!moveFound)
+                 {
+                     Legal.square = random.Next(0, 9);
+                     Legal.CheckSquare(board);
+                     if (Legal.isLegal)
+                     {
+                         AISquare = Legal.square;
+                         break;
+                     }
+                 }     */
+                int maxWert = allmoveeval[0];
+                board.win = 0;
+                evaluation(board, 1);
+                for (int i = 1; i < allmoveeval.Length; i++)
                 {
-                    Legal.square = random.Next(0, 9);
+                    if (allmoveeval[i] > maxWert)
+                    {
+                        maxWert = allmoveeval[i];
+                        maxIndex = i;
+                    }
+                }
+                AISquare = maxIndex;
+
+                /* Legal.square = maxIndex;
+                 Legal.CheckSquare(board);
+                 Console.WriteLine(Legal.square);
+                 Console.WriteLine(Legal.isLegal);
+                 if (Legal.isLegal == true)
+                 {
+
+                     Console.WriteLine(Legal.isLegal);
+                     AISquare = maxIndex;
+                 }
+                 else
+                 {
+                     bool moveFound=false;
+                      while (!moveFound)
+                      {
+                         Legal.square = random.Next(0, 8);
+                          Legal.CheckSquare(board);
+                          if (Legal.isLegal)
+                          {
+                              AISquare = Legal.square;
+                              moveFound = true;
+                              break;
+                          }
+                      }
+                     }*/
+            }
+                Console.WriteLine("AI:"+AISquare);
+        }
+            public int[] allmoveeval = new int[9];
+            public int[] allmoveeval2 = new int[9];
+            public int maxIndex = 0;
+            public void evaluation(Board board, int player)
+            {
+                legalCheck Legal = new legalCheck();
+                for (int i = 0; i < 9; i++)
+                {
+                    Legal.square = i;
                     Legal.CheckSquare(board);
                     if (Legal.isLegal)
                     {
-                        AISquare = Legal.square;
-                        moveFound=true;
-                        break;
+                        board.array[Legal.square] = player;
+                        if (player == 2)
+                        {
+                            PlayerWin(board);
+                            evaluation(board, 1);
+                            board.array[Legal.square] = 0;
+                            a--;
                     }
-                }     
-                board.win = 0;
-            }
-            Console.WriteLine(AISquare);
-        }
+                        else if (player == 1)
+                        {
+                            AIWin(board);
+                            evaluation(board, 2);
+                            board.array[Legal.square] = 0;
+                            a++;
+                        }
 
+                    /*
+                    PlayerWin(board);
+
+                    for (int i2 = 0; i2 < 9; i2++)
+                    {
+                        Legal.square = allMoves[i2];
+                        Legal.CheckSquare(board);
+                        if (Legal.isLegal)
+                        {
+                            board.array[Legal.square] = 1;
+                            AIWin(board);
+                            allmoveeval[i2] = a + a2;
+                            Console.WriteLine("eval:" + allmoveeval[i2]);
+                            board.array[Legal.square] = 0;
+                            a2= 0;
+                        }
+                    }*/
+                        allmoveeval[i] = a;
+                        board.array[Legal.square] = 0;
+                        a = 0;
+                    }
+                
+
+                }
+            
+         }
     }
 }
