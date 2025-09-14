@@ -142,6 +142,7 @@ namespace Tiktacktoe
             Random random = new Random();
             for (int i = 0; i <9; i++)
             {
+
                     Legal.square = i;
                     Legal.CheckSquare(board);// Checking if move is legal
                     if (Legal.isLegal)  // Move is legal
@@ -156,30 +157,29 @@ namespace Tiktacktoe
                             aiwin = true;
                         break;
                     }
-                        else if (tries == 8)//no winning move possible
+                        else if (i == board.remainingMoves)//no winning move possible
                         {
-                        Console.WriteLine("try:" + tries);
                         tries = 0;
                             board.array[Legal.square] = 0;
                             Console.WriteLine("random_else");
-                            while (randmove == true)
+                            for (int t = 0; t < 9; t++)
                             {
-                                Legal.square = random.Next(0, 8);
+                            Legal.square = t;
                                 Legal.CheckSquare(board);
                                 if (Legal.isLegal)
                                 {
-                                    Console.WriteLine("random:"+Legal.square);                               
+                                    Console.WriteLine("move found");                               
                                     random_move=Legal.square;
                                     randmove = true;
+                                    break;
                                 }
                             }
                             break;
                         }
                         else
                         { //Not a winning move
-                            Console.WriteLine("try:" + tries);
+                            Console.WriteLine("try:" + i);
                         board.array[Legal.square] = 0;
-                            tries = tries + 1;
 
 
                         }
@@ -187,7 +187,7 @@ namespace Tiktacktoe
                     }
                 
             }
-
+            tries = 0;
         }
         public void AIWin(Board board)
         {
@@ -276,7 +276,7 @@ namespace Tiktacktoe
             
             Random random = new Random();
             legalCheck Legal = new legalCheck();
-            randomMove(board);
+            //randomMove(board);
             PlayerWin(board);
             AIWin(board);
             if (Playerwin)
@@ -345,7 +345,18 @@ namespace Tiktacktoe
                         Console.WriteLine("illegal_");
                         randomMove(board);
                         Console.WriteLine("randommove:"+random_move);
-                        AISquare = random_move;
+                        Legal.square=random_move;
+                        if (Legal.isLegal)
+                        {
+                            Console.WriteLine("legal");
+                            AISquare = random_move;
+                        }
+                        else
+                        {
+                            Console.WriteLine("illegal");
+                            randomMove(board);
+                            AISquare = random_move;
+                        }
                     }
                 }
 
